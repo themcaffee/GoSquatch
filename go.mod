@@ -1,4 +1,4 @@
-module github.com/themcaffee/Squatch
+module github.com/themcaffee/GoSquatch
 
 go 1.19
 
