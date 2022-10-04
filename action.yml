@@ -1,0 +1,17 @@
+name: 'Squatch'
+description: 'Go template markdown into static site'
+inputs:
+  src-dir:
+    description: 'Source of markdown and template files'
+    required: false
+    default: 'src'
+  dist-dir:
+    description: 'Destination of templated markdown html'
+    required: false
+    default: 'dist'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.src-dir }}
+    - ${{ inputs.dist-dir }}
