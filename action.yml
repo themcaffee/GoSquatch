@@ -1,6 +1,8 @@
-name: 'Squatch'
+name: 'GoSquatch'
 author: 'Mitch McAffee'
 description: 'Go template markdown into static site'
+icon: 'book-open'
+color: 'green'
 inputs:
   srcDir:
     description: 'Source of markdown and template files'
