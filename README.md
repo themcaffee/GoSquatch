@@ -13,3 +13,10 @@ The source directory to pull the markdown and templates from. Default `"src"`.
 The distribution directory where the static html files will be put. Default `"dist"`.
 
 ### Example Usage
+
+```
+uses: actions/Squatch@v1
+with:
+    srcDir: 'src'
+    distDir: 'dist'
+```

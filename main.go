@@ -142,8 +142,21 @@ func InitApp(srcDir string, distDir string) (App, error) {
 }
 
 func main() {
-	app, err := InitApp("src", "dist")
+	// Get input variables from Github Actions
+	srcDir := os.Getenv("INPUT_SRC_DIR")
+	if len(srcDir) == 0 {
+		srcDir = "src"
+	}
+	distDir := os.Getenv("INPUT_DIST_DIR")
+	if len(distDir) == 0 {
+		distDir = "dist"
+	}
+
+	// Initialize the app
+	app, err := InitApp(srcDir, distDir)
 	check(err)
+
+	// Convert all pages
 	pages, err := app.getAllPages()
 	check(err)
 	for _, page := range pages {
