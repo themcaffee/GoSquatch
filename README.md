@@ -15,7 +15,7 @@ The distribution directory where the static html files will be put. Default `"di
 ### Example Usage
 
 ```
-uses: actions/Squatch@v1
+uses: themcaffee/GoSquatch@v1
 with:
     srcDir: 'src'
     distDir: 'dist'

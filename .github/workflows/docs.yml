@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build pages
-        uses: actions/GoSquatch@v1
+        uses: themcaffee/GoSquatch@v1
         with:
           srcDir: 'src_docs'
           distDir: 'docs'
