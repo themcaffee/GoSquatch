@@ -157,6 +157,7 @@ func InitApp(srcDir string, distDir string) (App, error) {
 }
 
 func main() {
+	fmt.Println("Starting build...")
 	// Get input variables from Github Actions
 	srcDir := os.Getenv("INPUT_SRC_DIR")
 	if len(srcDir) == 0 {
@@ -178,4 +179,5 @@ func main() {
 		err = app.renderPage(page)
 		check(err)
 	}
+	fmt.Println("Build complete!")
 }

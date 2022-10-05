@@ -29,6 +29,8 @@ jobs:
           distDir: 'docs'
       - name: Setup Pages
         uses: actions/configure-pages@v2
+      - name: ls
+        run: ls
       - name: Deploy
         uses: actions/upload-pages-artifact@v1
         with:
