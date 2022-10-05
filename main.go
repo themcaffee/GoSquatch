@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"text/template"
 
 	"github.com/gomarkdown/markdown"
@@ -59,6 +60,17 @@ func renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool
 	}
 }
 
+func getTitle(md []byte) (string, error) {
+	lines := strings.Split(string(md), "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "[_metadata_:title]:- \"") {
+			title := strings.TrimPrefix(line, "[_metadata_:title]:- \"")
+			return strings.TrimSuffix(title, "\""), nil
+		}
+	}
+	return "", fmt.Errorf("could not find title")
+}
+
 func (app App) renderPage(fp string) (err error) {
 	filename := filepath.Base(fp)
 	filename = filename[:len(filename)-3]
@@ -78,8 +90,11 @@ func (app App) renderPage(fp string) (err error) {
 	renderer := html.NewRenderer(opts)
 	output := string(markdown.ToHTML(md, nil, renderer))
 
-	// TODO parse title
-	title := filename
+	title, err := getTitle(md)
+	if err != nil {
+		fmt.Println("Could not get title for file: ", fp)
+		return err
+	}
 
 	// render the page with a template
 	page := Page{Title: title, Body: output}

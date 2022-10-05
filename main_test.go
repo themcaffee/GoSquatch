@@ -86,3 +86,30 @@ func TestRenderPage(t *testing.T) {
 		t.Errorf("expected example.html to exist, got %v", err)
 	}
 }
+
+func TestGetTitle(t *testing.T) {
+	srcTest := "src_test"
+	distTest := "dist_test"
+	defer cleanup(distTest)
+	md, _ := os.ReadFile(filepath.Join(srcTest, "pages", "example.md"))
+	title, err := getTitle(md)
+	if err != nil {
+		t.Errorf("expected getTitle to return no error, got %v", err)
+	}
+	if title != "Example page title" {
+		t.Errorf("expected title to be 'Example page title', got %v", title)
+	}
+}
+
+func TestGetTitleNoTitle(t *testing.T) {
+	srcTest := "src_test"
+	distTest := "dist_test"
+	defer cleanup(distTest)
+	os.WriteFile(filepath.Join(srcTest, "pages", "titleexample.md"), []byte("test"), 0644)
+	defer os.Remove(filepath.Join(srcTest, "pages", "titleexample.md"))
+	md, _ := os.ReadFile(filepath.Join(srcTest, "pages", "titleexample.md"))
+	_, err := getTitle(md)
+	if err == nil {
+		t.Errorf("expected getTitle to return an error, got %v", err)
+	}
+}
