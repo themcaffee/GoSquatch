@@ -1,0 +1,38 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "deploy"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build pages
+        uses: actions/GoSquatch@v1
+        with:
+          srcDir: 'src_docs'
+          distDir: 'docs'
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Deploy
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
