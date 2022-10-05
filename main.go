@@ -19,11 +19,13 @@ type App struct {
 	PageTemplate string
 	SrcDir       string
 	DistDir      string
+	LayoutsDir   map[string]string
 }
 
 type Page struct {
-	Title string
-	Body  string
+	Title  string
+	Body   string
+	Layout string
 }
 
 func check(e error) {
@@ -60,26 +62,13 @@ func renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool
 	}
 }
 
-func getTitle(md []byte) (string, error) {
-	lines := strings.Split(string(md), "\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "[_metadata_:title]:- \"") {
-			title := strings.TrimPrefix(line, "[_metadata_:title]:- \"")
-			return strings.TrimSuffix(title, "\""), nil
-		}
-	}
-	return "", fmt.Errorf("could not find title")
-}
-
-func (app App) renderPage(fp string) (err error) {
-	filename := filepath.Base(fp)
-	filename = filename[:len(filename)-3]
-
+func getPage(fp string) (Page, error) {
+	page := Page{}
 	// read the markdown file
 	md, err := os.ReadFile(fp)
 	if err != nil {
 		fmt.Println("Could not read file: ", fp)
-		return err
+		return page, err
 	}
 
 	// render the markdown file
@@ -88,16 +77,36 @@ func (app App) renderPage(fp string) (err error) {
 		RenderNodeHook: renderHook,
 	}
 	renderer := html.NewRenderer(opts)
-	output := string(markdown.ToHTML(md, nil, renderer))
+	page.Body = string(markdown.ToHTML(md, nil, renderer))
 
-	title, err := getTitle(md)
+	// Get metadata
+	lines := strings.Split(string(md), "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "[_metadata_:title]:- \"") {
+			title := strings.TrimPrefix(line, "[_metadata_:title]:- \"")
+			page.Title = strings.TrimSuffix(title, "\"")
+		}
+		if strings.HasPrefix(line, "[_metadata_:layout]:- \"") {
+			layout := strings.TrimPrefix(line, "[_metadata_:layout]:- \"")
+			page.Layout = strings.TrimSuffix(layout, "\"")
+		}
+	}
+	if page.Title == "" {
+		return page, fmt.Errorf("no title found in %v", fp)
+	}
+	if page.Layout == "" {
+		return page, fmt.Errorf("no layout found in %v", fp)
+	}
+	return page, nil
+}
+
+func (app App) renderPage(fp string) (err error) {
+	page, err := getPage(fp)
 	if err != nil {
 		fmt.Println("Could not get title for file: ", fp)
 		return err
 	}
 
-	// render the page with a template
-	page := Page{Title: title, Body: output}
 	t := template.New("Render")
 	t, err = t.Parse(app.PageTemplate)
 	if err != nil {
@@ -113,8 +122,17 @@ func (app App) renderPage(fp string) (err error) {
 	}
 
 	// write the page to a file
-	newFileName := filename + ".html"
-	newFilePath := filepath.Join(app.DistDir, newFileName)
+	relpath, err := filepath.Rel(app.SrcDir, fp)
+	if err != nil {
+		fmt.Println("Could not get relative path: ", err)
+		return err
+	}
+	newFilePath := relpath[:len(relpath)-3] + ".html"
+	newFilePath = filepath.Join(app.DistDir, newFilePath)
+	if err := os.MkdirAll(filepath.Dir(newFilePath), 0755); err != nil {
+		fmt.Println("Could not create directory: ", err)
+		return err
+	}
 	err = os.WriteFile(newFilePath, processed.Bytes(), 0644)
 	if err != nil {
 		fmt.Println("Could not write file: ", err)
@@ -125,18 +143,35 @@ func (app App) renderPage(fp string) (err error) {
 
 func (app App) getAllPages() ([]string, error) {
 	// get all markdown files
-	pageDir := filepath.Join(app.SrcDir, "pages")
-	files, err := os.ReadDir(pageDir)
-	if err != nil {
-		return nil, err
-	}
 	var mdFiles []string
-	for _, file := range files {
-		if filepath.Ext(file.Name()) == ".md" {
-			mdFiles = append(mdFiles, filepath.Join(app.SrcDir, "pages", file.Name()))
+	pageDir := filepath.Join(app.SrcDir)
+	filepath.Walk(pageDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
-	}
-	return mdFiles, err
+		if !info.IsDir() && filepath.Ext(path) == ".md" {
+			mdFiles = append(mdFiles, path)
+		}
+		return nil
+	})
+	return mdFiles, nil
+}
+
+func getAllLayouts(srcDir string) (map[string]string, error) {
+	// get all layouts
+	layouts := make(map[string]string)
+	filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(path) == ".html" {
+			name := filepath.Base(path)
+			name = name[:len(name)-5]
+			layouts[name] = path
+		}
+		return nil
+	})
+	return layouts, nil
 }
 
 func InitApp(srcDir string, distDir string) (App, error) {
@@ -145,11 +180,15 @@ func InitApp(srcDir string, distDir string) (App, error) {
 	os.RemoveAll(distDir)
 	// Create new dist directory
 	os.Mkdir(distDir, 0755)
-	// cache the page layout
-	templateLocation := filepath.Join(srcDir, "layout.html")
-	pageTemplateByte, err := os.ReadFile(templateLocation)
+	var err error
+	app.LayoutsDir, err = getAllLayouts(srcDir)
 	if err != nil {
-		fmt.Printf("error reading template file at %v: %v\n", err, templateLocation)
+		return app, err
+	}
+	// cache the page layout
+	pageTemplateByte, err := os.ReadFile(app.LayoutsDir["layout"])
+	if err != nil {
+		fmt.Printf("error reading template file at %v: %v\n", app.LayoutsDir["layout"], err)
 		return app, err
 	}
 	app.PageTemplate = string(pageTemplateByte)

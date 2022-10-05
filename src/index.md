@@ -1,21 +1,16 @@
-# Squatch
+[_metadata_:title]:- "GoSquatch"
+
+# GoSquatch
 
 A super fast Github Action that converts markdown into a static HTML site.
 
-## Inputs
+## Quick Setup
 
-#### `srcDir`
-
-The source directory to pull the markdown and templates from. Default `"src"`.
-
-#### `distDir`
-
-The distribution directory where the static html files will be put. Default `"dist"`.
-
-### Example Usage
+First off you will need to create a Github Action for your project if you don't already have one. Create the file `.github/workflows/gosquatch.yml`
+with the following content:
 
 ```
-name: Docs
+name: GoSquatch
 
 on:
   push:
@@ -56,3 +51,21 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v1
 ```
+
+### Create template file
+
+Squatch uses template files to define how to render a markdown page.
+
+### Create markdown index
+
+### Create markdown pages
+
+## Github Action Inputs
+
+#### `srcDir`
+
+The source directory to pull the markdown and templates from. Default `"src"`.
+
+#### `distDir`
+
+The distribution directory where the static html files will be put. Default `"dist"`.
