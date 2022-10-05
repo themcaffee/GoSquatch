@@ -21,4 +21,4 @@ WORKDIR /
 
 COPY --from=build /Squatch /Squatch
 
-ENTRYPOINT ["./Squatch"]
+ENTRYPOINT ["/Squatch"]
