@@ -1,4 +1,5 @@
 [_metadata_:title]:- "GoSquatch"
+[_metadata_:layout]:- "index"
 
 # GoSquatch
 

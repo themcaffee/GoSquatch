@@ -107,7 +107,31 @@ func (app App) renderPage(fp string) (err error) {
 		return err
 	}
 
-	t := template.New("Render")
+	innerLayoutByte, err := os.ReadFile(app.LayoutsDir["layout_"+page.Layout])
+	if err != nil {
+		fmt.Printf("error reading template file at %v: %v\n", app.LayoutsDir["layout_"+page.Layout], err)
+		return err
+	}
+	innerLayout := string(innerLayoutByte)
+
+	// Parse inner template
+	t := template.New("page")
+	t, err = t.Parse(innerLayout)
+	if err != nil {
+		fmt.Printf("error parsing template file at %v: %v\n", app.LayoutsDir[page.Layout], err)
+		return err
+	}
+	t = template.Must(t, err)
+	var inner bytes.Buffer
+	err = t.Execute(&inner, page)
+	if err != nil {
+		fmt.Println("error executing template: ", err)
+		return err
+	}
+	page.Body = inner.String()
+
+	// Parse outer template
+	t = template.New("Render")
 	t, err = t.Parse(app.PageTemplate)
 	if err != nil {
 		fmt.Println("Could not parse template: ", err)

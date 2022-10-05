@@ -1,6 +1,7 @@
-# Squatch
+# GoSquatch
 
-A super fast Github Action that converts markdown into a static HTML site.
+A super fast Github Action that converts markdown into a static HTML site. This is super useful for personal blogs and project documentation
+to keep pages in standard markdown but also be able to host through Github Pages (or other hosting providers).
 
 ## Inputs
 
