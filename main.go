@@ -159,11 +159,11 @@ func InitApp(srcDir string, distDir string) (App, error) {
 func main() {
 	fmt.Println("Starting build...")
 	// Get input variables from Github Actions
-	srcDir := os.Getenv("INPUT_SRC_DIR")
+	srcDir := os.Getenv("INPUT_SRCDIR")
 	if len(srcDir) == 0 {
 		srcDir = "src"
 	}
-	distDir := os.Getenv("INPUT_DIST_DIR")
+	distDir := os.Getenv("INPUT_DISTDIR")
 	if len(distDir) == 0 {
 		distDir = "dist"
 	}
