@@ -25,8 +25,8 @@ jobs:
       - name: Build pages
         uses: themcaffee/GoSquatch@v1.0.1-beta
         with:
-          srcDir: 'src'
-          distDir: 'docs'
+          srcDir: 'docs'
+          distDir: 'dist-docs'
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: ls
@@ -34,7 +34,7 @@ jobs:
       - name: Deploy
         uses: actions/upload-pages-artifact@v1
         with:
-          path: docs
+          path: dist-docs
       - name: Deploy to Github Pages
         id: deployment
         uses: actions/deploy-pages@v1
