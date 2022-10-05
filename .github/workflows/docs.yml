@@ -25,7 +25,7 @@ jobs:
       - name: Build pages
         uses: themcaffee/GoSquatch@v1.0.0-beta
         with:
-          srcDir: 'src_docs'
+          srcDir: '/github/workspace/src_docs'
           distDir: 'docs'
       - name: Setup Pages
         uses: actions/configure-pages@v2
