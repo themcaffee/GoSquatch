@@ -20,6 +20,5 @@ FROM alpine:latest
 WORKDIR /
 
 COPY --from=build /Squatch /Squatch
-COPY $INPUT_SRC_DIR /$INPUT_SRC_DIR
 
 ENTRYPOINT ["./Squatch"]
