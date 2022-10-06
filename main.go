@@ -16,11 +16,13 @@ import (
 )
 
 type App struct {
-	SiteTemplate string
-	SrcDir       string
-	DistDir      string
-	Layouts      map[string]string
-	Pages        []Page
+	SiteTemplate  string
+	SrcDir        string
+	DistDir       string
+	Layouts       map[string]string
+	Pages         []Page
+	IgnoreFolders map[string]bool
+	IgnoreFiles   map[string]bool
 }
 
 type Page struct {
@@ -179,15 +181,24 @@ func (app *App) parseSrcDirectory() error {
 		if err != nil {
 			return err
 		}
+
+		// Ignore directories and files
 		if info.IsDir() {
-			if info.Name() == app.DistDir {
+			if _, ok := app.IgnoreFolders[info.Name()]; ok {
+				return filepath.SkipDir
+			}
+			if strings.HasPrefix(info.Name(), ".") {
 				return filepath.SkipDir
 			}
 			return nil
 		}
+		if _, ok := app.IgnoreFiles[info.Name()]; ok {
+			return nil
+		}
+
+		// parse the layouts
 		ext := filepath.Ext(path)
 		base := filepath.Base(path)
-		// parse the layouts
 		if base == "layout.html" {
 			layoutByte, err := os.ReadFile(path)
 			if err != nil {
@@ -283,6 +294,24 @@ func main() {
 	distDir := os.Getenv("INPUT_DISTDIR")
 	if len(distDir) == 0 {
 		distDir = "dist"
+	}
+	ignoreFolders := map[string]bool{distDir: true}
+	ignoreFoldersEnv := os.Getenv("INPUT_IGNOREFOLDERS")
+	if len(ignoreFoldersEnv) > 0 {
+		// parse the comma separated list of folders to ignore
+		ignoreFoldersList := strings.Split(ignoreFoldersEnv, ",")
+		for _, folder := range ignoreFoldersList {
+			ignoreFolders[folder] = true
+		}
+	}
+	ignoreFiles := map[string]bool{}
+	ignoreFilesEnv := os.Getenv("INPUT_IGNOREFILES")
+	if len(ignoreFilesEnv) > 0 {
+		// parse the comma separated list of files to ignore
+		ignoreFilesList := strings.Split(ignoreFilesEnv, ",")
+		for _, file := range ignoreFilesList {
+			ignoreFiles[file] = true
+		}
 	}
 
 	// Initialize the app
