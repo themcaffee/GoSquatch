@@ -16,16 +16,26 @@ import (
 )
 
 type App struct {
-	PageTemplate string
+	SiteTemplate string
 	SrcDir       string
 	DistDir      string
-	LayoutsDir   map[string]string
+	Layouts      map[string]string
+	Pages        []Page
 }
 
 type Page struct {
-	Title  string
-	Body   string
-	Layout string
+	Title    string
+	Body     string
+	Layout   string
+	Filepath string
+}
+
+type InvalidPageError struct {
+	s string
+}
+
+func (e InvalidPageError) Error() string {
+	return e.s
 }
 
 func check(e error) {
@@ -63,7 +73,7 @@ func renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool
 }
 
 func getPage(fp string) (Page, error) {
-	page := Page{}
+	page := Page{Filepath: fp}
 	// read the markdown file
 	md, err := os.ReadFile(fp)
 	if err != nil {
@@ -91,34 +101,31 @@ func getPage(fp string) (Page, error) {
 			page.Layout = strings.TrimSuffix(layout, "\"")
 		}
 	}
+
+	// If the page metadata cannot be found, return an error to skip the page
+	// This is useful for markdown that are not pages
 	if page.Title == "" {
-		return page, fmt.Errorf("no title found in %v", fp)
+		return page, InvalidPageError{s: fmt.Sprintf("no title found in %v", fp)}
 	}
 	if page.Layout == "" {
-		return page, fmt.Errorf("no layout found in %v", fp)
+		return page, InvalidPageError{s: fmt.Sprintf("no layout found in %v", fp)}
 	}
 	return page, nil
 }
 
-func (app App) renderPage(fp string) (err error) {
-	page, err := getPage(fp)
-	if err != nil {
-		fmt.Println("Could not get title for file: ", fp)
-		return err
+func (app App) renderPage(page Page) (err error) {
+	innerLayout, ok := app.Layouts[page.Layout]
+	if !ok {
+		// Skip the page if the layout is not found
+		fmt.Printf("Could not find layout %v for page %v", page.Layout, page.Filepath)
+		return nil
 	}
-
-	innerLayoutByte, err := os.ReadFile(app.LayoutsDir["layout_"+page.Layout])
-	if err != nil {
-		fmt.Printf("error reading template file at %v: %v\n", app.LayoutsDir["layout_"+page.Layout], err)
-		return err
-	}
-	innerLayout := string(innerLayoutByte)
 
 	// Parse inner template
 	t := template.New("page")
 	t, err = t.Parse(innerLayout)
 	if err != nil {
-		fmt.Printf("error parsing template file at %v: %v\n", app.LayoutsDir[page.Layout], err)
+		fmt.Printf("error parsing template file at %v: %v\n", app.Layouts[page.Layout], err)
 		return err
 	}
 	t = template.Must(t, err)
@@ -132,7 +139,7 @@ func (app App) renderPage(fp string) (err error) {
 
 	// Parse outer template
 	t = template.New("Render")
-	t, err = t.Parse(app.PageTemplate)
+	t, err = t.Parse(app.SiteTemplate)
 	if err != nil {
 		fmt.Println("Could not parse template: ", err)
 		return err
@@ -146,7 +153,7 @@ func (app App) renderPage(fp string) (err error) {
 	}
 
 	// write the page to a file
-	relpath, err := filepath.Rel(app.SrcDir, fp)
+	relpath, err := filepath.Rel(app.SrcDir, page.Filepath)
 	if err != nil {
 		fmt.Println("Could not get relative path: ", err)
 		return err
@@ -165,37 +172,79 @@ func (app App) renderPage(fp string) (err error) {
 	return err
 }
 
-func (app App) getAllPages() ([]string, error) {
-	// get all markdown files
-	var mdFiles []string
-	pageDir := filepath.Join(app.SrcDir)
-	filepath.Walk(pageDir, func(path string, info os.FileInfo, err error) error {
+func (app *App) parseSrcDirectory() error {
+	app.Layouts = make(map[string]string)
+	app.Pages = make([]Page, 0)
+	err := filepath.Walk(app.SrcDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && filepath.Ext(path) == ".md" {
-			mdFiles = append(mdFiles, path)
+		if info.IsDir() {
+			return nil
 		}
-		return nil
-	})
-	return mdFiles, nil
-}
-
-func getAllLayouts(srcDir string) (map[string]string, error) {
-	// get all layouts
-	layouts := make(map[string]string)
-	filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && filepath.Ext(path) == ".html" {
+		ext := filepath.Ext(path)
+		base := filepath.Base(path)
+		// parse the layouts
+		if base == "layout.html" {
+			layoutByte, err := os.ReadFile(path)
+			if err != nil {
+				fmt.Println("Could not read file: ", path)
+				return err
+			}
+			app.SiteTemplate = string(layoutByte)
+		} else if ext == ".html" && strings.HasPrefix(base, "layout_") {
 			name := filepath.Base(path)
-			name = name[:len(name)-5]
-			layouts[name] = path
+			name = strings.TrimSuffix(name, ".html")
+			name = strings.TrimPrefix(name, "layout_")
+			layoutByte, err := os.ReadFile(path)
+			if err != nil {
+				fmt.Printf("error reading template file at %v: %v\n", path, err)
+				return err
+			}
+			app.Layouts[name] = string(layoutByte)
+		} else if ext == ".md" {
+			page, err := getPage(path)
+			// Skip pages we can't read because they could be README, LICENSE, drafts, etc.
+			if _, ok := err.(InvalidPageError); ok {
+				return nil
+			} else if err != nil {
+				fmt.Println("Could not read file: ", path)
+				return err
+			}
+			app.Pages = append(app.Pages, page)
+		} else {
+			// Copy any other file to the dist directory
+			relpath, err := filepath.Rel(app.SrcDir, path)
+			if err != nil {
+				fmt.Println("Could not get relative path: ", err)
+				return err
+			}
+			newFilePath := filepath.Join(app.DistDir, relpath)
+			if err := os.MkdirAll(filepath.Dir(newFilePath), 0755); err != nil {
+				fmt.Println("Could not create directory: ", err)
+				return err
+			}
+			source, err := os.Open(path)
+			if err != nil {
+				fmt.Println("Could not open source file: ", err)
+				return err
+			}
+			defer source.Close()
+			destination, err := os.Create(newFilePath)
+			if err != nil {
+				fmt.Println("Could not create destination file: ", err)
+				return err
+			}
+			defer destination.Close()
+			_, err = io.Copy(destination, source)
+			if err != nil {
+				fmt.Println("Could not copy file: ", err)
+				return err
+			}
 		}
 		return nil
 	})
-	return layouts, nil
+	return err
 }
 
 func InitApp(srcDir string, distDir string) (App, error) {
@@ -204,18 +253,10 @@ func InitApp(srcDir string, distDir string) (App, error) {
 	os.RemoveAll(distDir)
 	// Create new dist directory
 	os.Mkdir(distDir, 0755)
-	var err error
-	app.LayoutsDir, err = getAllLayouts(srcDir)
+	err := app.parseSrcDirectory()
 	if err != nil {
 		return app, err
 	}
-	// cache the page layout
-	pageTemplateByte, err := os.ReadFile(app.LayoutsDir["layout"])
-	if err != nil {
-		fmt.Printf("error reading template file at %v: %v\n", app.LayoutsDir["layout"], err)
-		return app, err
-	}
-	app.PageTemplate = string(pageTemplateByte)
 	return app, nil
 }
 
@@ -236,9 +277,7 @@ func main() {
 	check(err)
 
 	// Convert all pages
-	pages, err := app.getAllPages()
-	check(err)
-	for _, page := range pages {
+	for _, page := range app.Pages {
 		err = app.renderPage(page)
 		check(err)
 	}

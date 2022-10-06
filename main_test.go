@@ -35,8 +35,28 @@ func TestInitApp(t *testing.T) {
 	if app.DistDir != distTest {
 		t.Errorf("expected DistDir to be %v, got %v", distTest, app.DistDir)
 	}
-	if len(app.PageTemplate) == 0 {
-		t.Errorf("expected PageTemplate to be populated")
+	if len(app.SiteTemplate) == 0 {
+		t.Errorf("expected SiteTemplate to be populated")
+	}
+	if len(app.Pages) == 0 {
+		t.Errorf("expected Pages to be populated")
+	}
+	if len(app.Layouts) == 0 {
+		t.Errorf("expected Layouts to be populated")
+	}
+	// check that non-page files were moved
+	_, err = os.Stat(filepath.Join(distTest, "static", "main.css"))
+	if err != nil {
+		t.Errorf("expected main.css to exist, got %v", err)
+	}
+	// check that non-page md files were not moved
+	_, err = os.Stat(filepath.Join(distTest, "README.html"))
+	if err == nil {
+		t.Errorf("expected README.html to not exist, got %v", err)
+	}
+	_, err = os.Stat(filepath.Join(distTest, "README.md"))
+	if err == nil {
+		t.Errorf("expected README.md to not exist, got %v", err)
 	}
 }
 
@@ -50,27 +70,12 @@ func TestInitAppEmptyTemplate(t *testing.T) {
 	}
 }
 
-func TestGetAllPages(t *testing.T) {
-	srcTest := "src_test"
-	distTest := "dist_test"
-	defer cleanup(distTest)
-	app, _ := InitApp(srcTest, distTest)
-	pages, err := app.getAllPages()
-	if err != nil {
-		t.Errorf("expected getAllPages to return no error, got %v", err)
-	}
-	if len(pages) != 2 {
-		t.Errorf("expected 2 pages, got %v", len(pages))
-	}
-}
-
 func TestRenderPage(t *testing.T) {
 	srcTest := "src_test"
 	distTest := "dist_test"
 	defer cleanup(distTest)
 	app, _ := InitApp(srcTest, distTest)
-	pages, _ := app.getAllPages()
-	for _, page := range pages {
+	for _, page := range app.Pages {
 		err := app.renderPage(page)
 		if err != nil {
 			t.Errorf("expected renderPage to return no error, got %v", err)
