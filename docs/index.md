@@ -146,7 +146,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build pages
-        uses: themcaffee/GoSquatch@v1.0.5-beta
+        uses: themcaffee/GoSquatch@v1.0.7-beta
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: ls
