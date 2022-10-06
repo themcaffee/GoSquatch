@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build pages
-        uses: themcaffee/GoSquatch@v1.0.8-beta
+        uses: themcaffee/GoSquatch@v1.0.9-beta
         with:
           srcDir: docs
       - name: Setup Pages
