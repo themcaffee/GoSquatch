@@ -263,6 +263,16 @@ func InitApp(srcDir string, distDir string) (App, error) {
 	return app, nil
 }
 
+func (app App) printDistFolder() {
+	filepath.Walk(app.DistDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		fmt.Println(path)
+		return nil
+	})
+}
+
 func main() {
 	fmt.Println("Starting build...")
 	// Get input variables from Github Actions
@@ -284,5 +294,6 @@ func main() {
 		err = app.renderPage(page)
 		check(err)
 	}
-	fmt.Println("Build complete!")
+	fmt.Println("Build complete! Dist folder:")
+	app.printDistFolder()
 }
