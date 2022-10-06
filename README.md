@@ -1,7 +1,7 @@
 # GoSquatch
 
 A super fast Github Action that converts markdown into a static HTML site. This is super useful for personal blogs and project documentation
-to keep pages in standard markdown but also be able to host through Github Pages (or other hosting providers).
+to keep pages in standard markdown but also be able to host through Github Pages (or other hosting providers). GoSquatch uses [native golang html templating](https://pkg.go.dev/html/template) and [gomarkdown/markdown](https://github.com/gomarkdown/markdown) to handle markdown parsing.
 
 _How fast?_ GoSquatch takes about 3 seconds on Github Actions to execute. This allows with checking out the code and publishing it to Github Pages to only take around 20 - 30 seconds in total execution time. Check out this repo's [Actions](https://github.com/themcaffee/GoSquatch/actions) for real examples of performance.
 
@@ -63,3 +63,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v1
 ```
+
+## License
+
+The scripts and documentation in this project are released under the [MIT License](https://github.com/themcaffee/GoSquatch/blob/main/LICENSE).
