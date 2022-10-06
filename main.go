@@ -289,7 +289,7 @@ func main() {
 	// Get input variables from Github Actions
 	srcDir := os.Getenv("INPUT_SRCDIR")
 	if len(srcDir) == 0 {
-		srcDir = "src"
+		srcDir = "./"
 	}
 	distDir := os.Getenv("INPUT_DISTDIR")
 	if len(distDir) == 0 {

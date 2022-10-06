@@ -8,7 +8,7 @@ inputs:
   srcDir:
     description: 'Source of markdown and template files'
     required: false
-    default: 'src'
+    default: './'
   distDir:
     description: 'Destination of templated markdown html'
     required: false
