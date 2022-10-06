@@ -99,7 +99,7 @@ defining metadata. This metadata will not be rendered by any spec compliant mark
 I'm getting started with GoSquatch!
 ```
 
-This will be parsed into `index.html` in `dist` (see [Github Actions](https://mitchmcaffee.com/GoSquatchDocs/github-actions) for more about configuration options). To create a different page with a template of `layout_pages.html`, in the folder blog, with the name `awesome-post.md` could look like:
+This will be parsed into `index.html` in `dist` (see [Github Actions](https://mitchmcaffee.com/GoSquatch/github-actions) for more about configuration options). To create a different page with a template of `layout_pages.html`, in the folder blog, with the name `awesome-post.md` could look like:
 
 ```
 [_metadata_:title]:- "My first post!"
