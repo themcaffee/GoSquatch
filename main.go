@@ -180,6 +180,9 @@ func (app *App) parseSrcDirectory() error {
 			return err
 		}
 		if info.IsDir() {
+			if info.Name() == app.DistDir {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		ext := filepath.Ext(path)
