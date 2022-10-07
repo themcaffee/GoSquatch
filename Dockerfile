@@ -2,4 +2,4 @@
 
 FROM ghcr.io/themcaffee/gosquatch:main
 
-ENTRYPOINT ["/Squatch"]
+ENTRYPOINT ["/gosquatch"]

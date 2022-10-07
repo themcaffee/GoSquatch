@@ -1,7 +1,8 @@
 # GoSquatch
 
 A super fast Github Action that converts markdown into a static HTML site. This is super useful for personal blogs and project documentation
-to keep pages in standard markdown but also be able to host through Github Pages (or other hosting providers). GoSquatch uses [native golang templating](https://pkg.go.dev/text/template) and [gomarkdown/markdown](https://github.com/gomarkdown/markdown) to handle markdown parsing.
+to keep pages in standard markdown but also be able to host through Github Pages (or other hosting providers). GoSquatch uses [native golang templating](https://pkg.go.dev/text/template) and [gomarkdown/markdown](https://github.com/gomarkdown/markdown) to handle markdown parsing. It includes a live building
+server so you can easily see you can build your site locally before publishing it.
 
 _How fast?_ 
 
@@ -86,6 +87,15 @@ jobs:
 This project uses text/template over html/template because GoSquatch is generating HTML over just formatted text placed in an HTML document. Do not use 
 this on untrusted sources because any .js files will be copied in to the folder that gets uploaded to Github Pages. This is by design so that javascript 
 sources can be included in the website. If you want to ignore files or folders, there are inputs to the action that can be used.
+
+## Install live building server
+
+```
+curl -s --compressed "https://mitchmcaffee.com/GoSquatch/ppa/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/gosquatch.gpg >/dev/null
+sudo curl -s --compressed -o /etc/apt/sources.list.d/gosquatch_list_file.list "https://mitchmcaffee.com/ppa/gosquatch_list_file.list"
+sudo apt update
+sudo apt install gosquatch
+```
 
 
 ## License

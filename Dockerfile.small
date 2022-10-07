@@ -11,7 +11,7 @@ RUN go mod download
 
 # Build application
 COPY *.go ./
-RUN go build -o Squatch
+RUN go build -o gosquatch
 
 ## Build a small image
 
@@ -19,4 +19,4 @@ FROM alpine:latest
 
 WORKDIR /
 
-COPY --from=build /Squatch /Squatch
+COPY --from=build /gosquatch /gosquatch

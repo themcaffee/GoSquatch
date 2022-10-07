@@ -16,3 +16,6 @@
 dist
 dist_test
 Squatch
+gosquatch
+gosquatch_*/
+*.deb

@@ -1,0 +1,1 @@
+deb [signed-by=/etc/apt/trusted.gpg.d/gosquatch.gpg] https://mitchmcaffee.com/GoSquatch/ppa ./

@@ -14,7 +14,7 @@ env:
   IMAGE_NAME: themcaffee/GoSquatch
 
 jobs:
-  build:
+  build-docker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,7 +48,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   create-release:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-docker
     permissions:
       contents: write
     steps:
@@ -69,6 +69,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v2
+      - name: Configure GPG key
+        run: |
+          echo -n "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
+        env:
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+      - name: Build debian package
+        run: |
+          ./build-deb.sh
       - name: Build pages
         uses: themcaffee/GoSquatch@v1.0.11-beta
         with:
