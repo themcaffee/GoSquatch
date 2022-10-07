@@ -2,8 +2,8 @@ name: Publish Action and Docs
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
 
 concurrency:
   group: "deploy"
@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build pages
-        uses: themcaffee/GoSquatch@latest
+        uses: themcaffee/GoSquatch@v1.0.11-beta
         with:
           srcDir: docs
       - name: Setup Pages
