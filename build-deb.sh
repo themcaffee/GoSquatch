@@ -13,7 +13,7 @@ maintainer="Mitch McAffee <squatch@mitchmcaffee.com>"
 Description="Convert markdown to a static site"
 gpgEmail="gpg@mitchmcaffee.com"
 
-packageDir="gosquatch_1.0.13-1_amd64" # The name of the debian package directory
+packageDir="gosquatch_$1-1_amd64" # The name of the debian package directory
 
 go build -o gosquatch .
 

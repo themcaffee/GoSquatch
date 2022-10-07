@@ -91,8 +91,8 @@ sources can be included in the website. If you want to ignore files or folders, 
 ## Install live building server
 
 ```
-curl -s --compressed "https://mitchmcaffee.com/GoSquatch/ppa/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/gosquatch.gpg >/dev/null
-sudo curl -s --compressed -o /etc/apt/sources.list.d/gosquatch_list_file.list "https://mitchmcaffee.com/ppa/gosquatch_list_file.list"
+curl -s --compressed "https://www.mitchmcaffee.com/GoSquatch/ppa/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/gosquatch.gpg > /dev/null
+sudo curl -s --compressed -o /etc/apt/sources.list.d/gosquatch_list_file.list "https://www.mitchmcaffee.com/GoSquatch/ppa/gosquatch_list_file.list"
 sudo apt update
 sudo apt install gosquatch
 ```
