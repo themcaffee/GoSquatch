@@ -1,0 +1,48 @@
+{
+    "BlockQuote": "",
+    "List": {},
+    "ListItem": {},
+    "Paragraph": "",
+    "Math": "",
+    "MathBlock": "",
+    "Heading": {
+        "Level": {
+            "0": "title is-1 has-text-centered",
+            "1": "title is-2",
+            "2": "title is-3",
+            "3": "title is-4",
+            "4": "title is-5",
+            "5": "title is-6"
+        }
+        
+    },
+    "HorizontalRule": "",
+    "Emph": "",
+    "Strong": "",
+    "Del": "",
+    "Link": {},
+    "CrossReference": {},
+    "Citation": {},
+    "Image": "",
+    "Text": "",
+    "HTMLBlock": "",
+    "CodeBlock": {},
+    "Softbreak": "",
+    "Hardbreak": "",
+    "NonBlockingSpace": "",
+    "Code": "",
+    "HTMLSpan": "",
+    "Table": "",
+    "TableCell": {},
+    "TableHeader": "",
+    "TableBody": "",
+    "TableRow": "",
+    "TableFooter": "",
+    "Caption": "",
+    "CaptionFigure": "",
+    "Callout": {},
+    "Index": {},
+    "Subscript": "",
+    "Superscript": "",
+    "Footnotes": "" 
+}
