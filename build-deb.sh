@@ -15,6 +15,8 @@ gpgEmail="gpg@mitchmcaffee.com"
 
 packageDir="gosquatch_1.0.13-1_amd64" # The name of the debian package directory
 
+go build -o gosquatch .
+
 # Create the internal folder structure
 mkdir $packageDir
 mkdir -p $packageDir/usr/local/bin
@@ -32,7 +34,15 @@ echo "Description: $Description" >> $packageDir/DEBIAN/control
 # Build the deb package
 dpkg-deb --build --root-owner-group $packageDir
 
+# Cleanup the build folder
 rm -rf $packageDir
+
+# Cleanup the dist folder
+rm docs/ppa/Packages
+rm docs/ppa/Packages.gz
+rm docs/ppa/Release
+rm docs/ppa/Release.gpg
+rm docs/ppa/InRelease
 
 # Move to the docs folder for distribution
 mv $packageDir.deb docs/ppa/$packageDir.deb

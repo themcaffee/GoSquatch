@@ -19,3 +19,8 @@ Squatch
 gosquatch
 gosquatch_*/
 *.deb
+docs/ppa/Release
+docs/ppa/Release.gpg
+docs/ppa/Packages.gz
+docs/ppa/Packages
+docs/ppa/InRelease
