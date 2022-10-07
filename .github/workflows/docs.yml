@@ -17,6 +17,7 @@ concurrency:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v2
       - uses: "marvinpinto/action-automatic-releases@latest"
