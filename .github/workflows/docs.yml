@@ -78,7 +78,7 @@ jobs:
         run: |
           ./build-deb.sh
       - name: Build pages
-        uses: themcaffee/GoSquatch@v1.0.16-beta
+        uses: themcaffee/GoSquatch@v1.0.17-beta
         with:
           srcDir: docs
       - name: Setup Pages
