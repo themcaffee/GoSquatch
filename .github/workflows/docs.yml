@@ -22,8 +22,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v2
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
       - name: Build pages
-        uses: themcaffee/GoSquatch@v1.0.10-beta
+        uses: themcaffee/GoSquatch@latest
         with:
           srcDir: docs
       - name: Setup Pages
