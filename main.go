@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -238,18 +239,31 @@ func (app *App) parseSrcDirectory() error {
 	return err
 }
 
-func InitApp(srcDir string, distDir string) (App, error) {
-	app := App{SrcDir: srcDir, DistDir: distDir}
-	// Remove existing dist directory
-	os.RemoveAll(distDir)
-	// Create new dist directory
-	os.Mkdir(distDir, 0755)
-	err := app.parseSrcDirectory()
+func InitApp(srcDir string) (App, error) {
+	app := App{SrcDir: srcDir}
+	// Parse the theme config
+	squatchConfig, err := getSquatchConfig(filepath.Join(app.SrcDir, ".squatch"))
 	if err != nil {
 		return app, err
 	}
-	// Parse the theme config
-	app.ThemeConfig, err = getThemeConfig(filepath.Join(app.SrcDir, ".squatch"))
+	app.DistDir = squatchConfig.DistDir
+	// parse the comma separated list of folders to ignore
+	app.IgnoreFolders = map[string]bool{app.DistDir: true}
+	ignoreFoldersList := strings.Split(squatchConfig.IgnoreFolders, ",")
+	for _, folder := range ignoreFoldersList {
+		app.IgnoreFolders[folder] = true
+	}
+	app.IgnoreFiles = map[string]bool{}
+	// parse the comma separated list of files to ignore
+	ignoreFilesList := strings.Split(squatchConfig.IgnoreFiles, ",")
+	for _, file := range ignoreFilesList {
+		app.IgnoreFiles[file] = true
+	}
+	// Remove existing dist directory
+	os.RemoveAll(app.DistDir)
+	// Create new dist directory
+	os.Mkdir(app.DistDir, 0755)
+	err = app.parseSrcDirectory()
 	if err != nil {
 		return app, err
 	}
@@ -266,38 +280,18 @@ func (app App) printDistFolder() {
 	})
 }
 
-func main() {
+func Build(srcDir string) {
 	fmt.Println("Starting build...")
 	// Get input variables from Github Actions
-	srcDir := os.Getenv("INPUT_SRCDIR")
-	if len(srcDir) == 0 {
-		srcDir = "./"
-	}
-	distDir := os.Getenv("INPUT_DISTDIR")
-	if len(distDir) == 0 {
-		distDir = "dist"
-	}
-	ignoreFolders := map[string]bool{distDir: true}
-	ignoreFoldersEnv := os.Getenv("INPUT_IGNOREFOLDERS")
-	if len(ignoreFoldersEnv) > 0 {
-		// parse the comma separated list of folders to ignore
-		ignoreFoldersList := strings.Split(ignoreFoldersEnv, ",")
-		for _, folder := range ignoreFoldersList {
-			ignoreFolders[folder] = true
-		}
-	}
-	ignoreFiles := map[string]bool{}
-	ignoreFilesEnv := os.Getenv("INPUT_IGNOREFILES")
-	if len(ignoreFilesEnv) > 0 {
-		// parse the comma separated list of files to ignore
-		ignoreFilesList := strings.Split(ignoreFilesEnv, ",")
-		for _, file := range ignoreFilesList {
-			ignoreFiles[file] = true
-		}
+	srcDirEnv := os.Getenv("INPUT_SRCDIR")
+	if len(srcDirEnv) != 0 {
+		srcDir = srcDirEnv
+	} else if len(srcDir) == 0 {
+		srcDir = "src"
 	}
 
 	// Initialize the app
-	app, err := InitApp(srcDir, distDir)
+	app, err := InitApp(srcDir)
 	check(err)
 
 	// Convert all pages
@@ -307,4 +301,18 @@ func main() {
 	}
 	fmt.Println("Build complete! Dist folder:")
 	app.printDistFolder()
+}
+
+func main() {
+	var srcDir string
+	flag.StringVar(&srcDir, "src-dir", "src", "Source directory")
+	var port string
+	flag.StringVar(&port, "port", "8080", "Port to run the live server on")
+	liveServerPtr := flag.Bool("live-server", false, "Run a live server")
+	flag.Parse()
+	if *liveServerPtr {
+		LiveServer(srcDir, port)
+	} else {
+		Build(srcDir)
+	}
 }

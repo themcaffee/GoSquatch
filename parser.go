@@ -10,6 +10,13 @@ import (
 	"github.com/gomarkdown/markdown/ast"
 )
 
+type SquatchConfig struct {
+	DistDir       string      `json:"dist"`
+	IgnoreFolders string      `json:"ignore_folders"`
+	IgnoreFiles   string      `json:"ignore_files"`
+	ThemeConfig   ThemeConfig `json:"theme"`
+}
+
 type ThemeConfig struct {
 	BlockTemplate    string         `json:"block_template"`
 	List             List           `json:"list"`
@@ -89,8 +96,8 @@ type Callout struct {
 type Index struct {
 }
 
-func getThemeConfig(fp string) (ThemeConfig, error) {
-	var configStruct ThemeConfig
+func getSquatchConfig(fp string) (SquatchConfig, error) {
+	var configStruct SquatchConfig
 	// read the config file
 	config, err := os.ReadFile(fp)
 	if err != nil {
