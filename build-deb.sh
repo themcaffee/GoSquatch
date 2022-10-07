@@ -53,5 +53,5 @@ gzip -k -f docs/ppa/Packages
 
 # Sign the package
 apt-ftparchive release docs/ppa > docs/ppa/Release
-gpg --default-key "${gpgEmail}" -abs -o docs/ppa/Release > docs/ppa/Release.gpg
-gpg --default-key "${gpgEmail}" --clearsign -o docs/ppa/Release > docs/ppa/InRelease
+gpg --default-key "${gpgEmail}" -abs -o - docs/ppa/Release > docs/ppa/Release.gpg
+gpg --default-key "${gpgEmail}" --clearsign -o - docs/ppa/Release > docs/ppa/InRelease
