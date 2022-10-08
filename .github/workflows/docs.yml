@@ -29,9 +29,7 @@ jobs:
         run: go test -v ./...
       - name: Write version to Dockerfile
         run: |
-          tag=sed -i 's/refs\/tags\////' < ${{ github.ref }}
-          tag=sed -i 's/\////' < $tag
-          sed -i 's/VERSION/$tag/' Dockerfile
+          sed -i 's/VERSION/${{ github.ref_name }}/' Dockerfile
       - name: Log in to the Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
@@ -81,11 +79,9 @@ jobs:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
       - name: Build debian package
         run: |
-          tag=sed -i 's/refs\/tags\////' < ${{ github.ref }}
-          tag=sed -i 's/\////' < $tag
-          ./build-deb.sh $tag
+          ./build-deb.sh ${{ github.ref_name }}
       - name: Build pages
-        uses: themcaffee/GoSquatch@v1.0.20-beta
+        uses: themcaffee/GoSquatch@v1.0.21-beta
         with:
           srcDir: docs
       - name: Setup Pages
