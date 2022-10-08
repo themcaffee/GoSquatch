@@ -77,11 +77,8 @@ jobs:
       - name: Build debian package
         run: |
           ./build-deb.sh ${{ github.ref_name }}
-      - name: Write version to Dockerfile
-        run: |
-          sed -i 's/VERSION/${{ github.ref_name }}/' Dockerfile
       - name: Build pages
-        uses: themcaffee/GoSquatch@v1.0.22-beta
+        uses: themcaffee/GoSquatch@v1.0.23-beta
         with:
           srcDir: docs
       - name: Setup Pages
