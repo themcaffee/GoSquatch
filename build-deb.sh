@@ -47,11 +47,13 @@ rm docs/ppa/InRelease
 # Move to the docs folder for distribution
 mv $packageDir.deb docs/ppa/$packageDir.deb
 
+cd docs/ppa
+
 # Create the signature
-dpkg-scanpackages --multiversion docs/ppa > docs/ppa/Packages
-gzip -k -f docs/ppa/Packages
+dpkg-scanpackages --multiversion . > Packages
+gzip -k -f Packages
 
 # Sign the package
-apt-ftparchive release docs/ppa > docs/ppa/Release
-gpg --default-key "${gpgEmail}" -abs -o - docs/ppa/Release > docs/ppa/Release.gpg
-gpg --default-key "${gpgEmail}" --clearsign -o - docs/ppa/Release > docs/ppa/InRelease
+apt-ftparchive release . > Release
+gpg --default-key "${gpgEmail}" -abs -o - Release > Release.gpg
+gpg --default-key "${gpgEmail}" --clearsign -o - Release > InRelease

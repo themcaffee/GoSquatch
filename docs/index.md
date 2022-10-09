@@ -162,5 +162,4 @@ jobs:
 
 Congrats! Push and commit your changes and you will see your new site at the URL produced at the end of the action. 
 
-### Live building server
-
+Now check out how to setup the [live building server](https://mitchmcaffee.com/GoSquatch/live-server)!
