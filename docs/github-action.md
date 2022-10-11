@@ -1,7 +1,7 @@
-[_metadata_:title]:- "Github Actions"
+[_metadata_:title]:- "Github Action"
 [_metadata_:layout]:- "index"
 
-# Github Actions
+# Github Action
 
 GoSquatch provides a Github Action on the Marketplace. You can check it out [here!](https://github.com/marketplace/actions/gosquatch)
 
@@ -11,17 +11,10 @@ GoSquatch provides a Github Action on the Marketplace. You can check it out [her
 
 The source directory to pull the markdown and templates from. Default `"src"`.
 
-#### `distDir`
+## Configuration
 
-The distribution directory where the static html files will be put. Default `"dist"`.
-
-#### `ignoreFolders`
-
-Comma seperated list of folders to ignore. Any folders starting with "." will always be ignored. Default `"node_modules"`
-
-#### `ignoreFiles`
-
-Comma seperated list of files to ignore. Default `"LICENSE, yarn.lock"`
+GoSquatch is configured with a `.squatch` in the folder `srcDir`. This file is not required and the action will just fine without it. However,
+if you need additional configuration options then it is available.
 
 ## Example Usage
 

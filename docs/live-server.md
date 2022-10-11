@@ -24,10 +24,19 @@ gosquatch -live-server -src-dir=./ -port=8080
 
 Then visit your site at [http://localhost:8080](http://localhost:8080)
 
-## Options
+### Options
 
 `-src-dir`: The location of your source directory
 
 `-port`: The port the live server runs on
 
 `-live-server`: Runs the live-server. If this is not included, GoSquatch runs in build mode.
+
+## Updating GoSquatch
+
+Updating your local installation of GoSquatch is just like any other apt package:
+
+```
+sudo apt update
+sudo apt upgrade
+```
