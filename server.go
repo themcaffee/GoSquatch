@@ -15,7 +15,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func filewatch(srcDir string) {
+func filewatch(srcDir string, distDir string) {
 	// Create new watcher.
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -24,7 +24,7 @@ func filewatch(srcDir string) {
 	defer watcher.Close()
 
 	// Start listening for events.
-	go watchLoop(watcher, srcDir)
+	go watchLoop(watcher, srcDir, distDir)
 
 	// Add a path.
 	err = watcher.Add(srcDir)
@@ -34,7 +34,7 @@ func filewatch(srcDir string) {
 	<-make(chan struct{}) // Block forever
 }
 
-func watchLoop(w *fsnotify.Watcher, srcDir string) {
+func watchLoop(w *fsnotify.Watcher, srcDir string, distDir string) {
 	var (
 		// Wait 100ms for new events; each new event resets the timer.
 		waitFor = 100 * time.Millisecond
@@ -45,6 +45,11 @@ func watchLoop(w *fsnotify.Watcher, srcDir string) {
 
 		// Callback we run.
 		buildEvent = func(e fsnotify.Event) {
+			// Ignore the build directory
+			baseDir := filepath.Base(e.Name)
+			if baseDir == distDir {
+				return
+			}
 			Build(srcDir)
 
 			// Don't need to remove the timer if you don't have a lot of files.
@@ -139,12 +144,8 @@ func LiveServer(srcDir string, port string) {
 		panic(err)
 	}
 
-	go filewatch(app.SrcDir)
+	go filewatch(app.SrcDir, app.DistDir)
 	Build(app.SrcDir)
-
-	// serve static files
-	fs := http.FileServer(http.Dir("./web/static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// serve pages
 	mux := http.NewServeMux()
