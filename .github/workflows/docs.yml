@@ -3,7 +3,7 @@ name: Publish Action and Docs
 on:
   push:
     tags:
-      - "v*"
+      - "*.*.*"
 
 concurrency:
   group: "deploy"
