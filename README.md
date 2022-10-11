@@ -2,7 +2,7 @@
 
 A super fast Github Action that converts markdown into a static HTML site. This is super useful for personal blogs and project documentation
 to keep pages in standard markdown but also be able to host through Github Pages (or other hosting providers). GoSquatch uses [native golang templating](https://pkg.go.dev/text/template) and [gomarkdown/markdown](https://github.com/gomarkdown/markdown) to handle markdown parsing. It includes a live building
-server so you can easily see you can build your site locally before publishing it.
+server so you can easily see your site locally before publishing it.
 
 _How fast?_ 
 
