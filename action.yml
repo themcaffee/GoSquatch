@@ -9,23 +9,8 @@ inputs:
     description: 'Source of markdown and template files'
     required: false
     default: './'
-  distDir:
-    description: 'Destination of templated markdown html'
-    required: false
-    default: 'dist'
-  ignoreFolders:
-    description: 'Comma seperated list of folders to ignore. Any folders starting with "." will always be ignored.'
-    required: false
-    default: 'node_modules'
-  ignoreFiles:
-    description: 'Comma seperated list of files to ignore'
-    required: false
-    default: 'LICENSE, yarn.lock'
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
     - ${{ inputs.srcDir }}
-    - ${{ inputs.distDir }}
-    - ${{ inputs.ignoreFolders }}
-    - ${{ inputs.ignoreFiles }}

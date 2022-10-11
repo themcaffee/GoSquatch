@@ -7,7 +7,6 @@
 # 1. The version of the project
 
 packageName="gosquatch"
-debianPackageVersion="1.0"
 architecture="amd64"
 maintainer="Mitch McAffee <squatch@mitchmcaffee.com>"
 Description="Convert markdown to a static site"
@@ -26,7 +25,7 @@ cp gosquatch $packageDir/usr/local/bin
 mkdir -p $packageDir/DEBIAN
 touch $packageDir/DEBIAN/control
 echo "Package: $packageName" >> $packageDir/DEBIAN/control
-echo "Version: $debianPackageVersion" >> $packageDir/DEBIAN/control
+echo "Version: $1" >> $packageDir/DEBIAN/control
 echo "Architecture: $architecture" >> $packageDir/DEBIAN/control
 echo "Maintainer: $maintainer" >> $packageDir/DEBIAN/control
 echo "Description: $Description" >> $packageDir/DEBIAN/control

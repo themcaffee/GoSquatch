@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
 
-FROM ghcr.io/themcaffee/gosquatch:v1.0.25-beta
+FROM ghcr.io/themcaffee/gosquatch:1.0.26-beta
 
 ENTRYPOINT ["/gosquatch"]
