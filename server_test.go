@@ -23,6 +23,7 @@ func TestPing(t *testing.T) {
 
 func TestGetLivePageIndex(t *testing.T) {
 	srcDir := "src_test"
+	defer cleanup("dist")
 	req := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
 	app, err := InitApp(srcDir)
@@ -47,6 +48,7 @@ func TestGetLivePageIndex(t *testing.T) {
 
 func TestGetLivePage(t *testing.T) {
 	srcDir := "src_test"
+	defer cleanup("dist")
 	req := httptest.NewRequest("GET", "/pages/example", nil)
 	w := httptest.NewRecorder()
 	app, err := InitApp(srcDir)

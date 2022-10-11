@@ -6,8 +6,7 @@ server so you can easily see you can build your site locally before publishing i
 
 _How fast?_ 
 
-GoSquatch takes about 3 seconds on Github Actions to execute. This allows with checking out the code and publishing it to Github Pages to only take around 
-20 - 30 seconds in total execution time. Check out the `deploy-pages` job in the [`Publish Action and Docs`](docker/build-push-action) Action for real examples of performance. The only relevant job for this performance is `deploy-pages`.
+GoSquatch takes about 3 seconds on Github Actions to execute. This allows with checking out the code and publishing it to Github Pages to only take around 20 - 30 seconds in total execution time. Check out the [GoSquatch-template's Github Actions](https://github.com/themcaffee/GoSquatch-template/actions) for real examples of performance. 
 
 
 _Why is it so fast?_ 

@@ -40,7 +40,7 @@ func TestInitApp(t *testing.T) {
 	if len(app.Layouts) == 0 {
 		t.Errorf("expected Layouts to be populated")
 	}
-	if app.DistDir != "dist_test" {
+	if app.DistDir != "dist" {
 		t.Errorf("expected DistDir to be 'dist', got %v", app.DistDir)
 	}
 	// check that non-page files were moved
@@ -102,5 +102,39 @@ func TestGetPage(t *testing.T) {
 	}
 	if page.Layout != "pages" {
 		t.Errorf("expected page layout to be 'pages', got %v", page.Layout)
+	}
+}
+
+func TestBuild(t *testing.T) {
+	srcTest := "src_test"
+	defer cleanup("dist")
+	Build(srcTest)
+	// check that the files were created
+	_, err := os.Stat(filepath.Join("dist", "index.html"))
+	if err != nil {
+		t.Errorf("expected index.html to exist, got %v", err)
+	}
+	_, err = os.Stat(filepath.Join("dist", "pages", "example.html"))
+	if err != nil {
+		t.Errorf("expected example.html to exist, got %v", err)
+	}
+}
+
+func TestBuildNoSquatchFile(t *testing.T) {
+	srcTest := "src_test"
+	defer cleanup("dist")
+	defer os.Rename(filepath.Join(srcTest, ".bak"), filepath.Join(srcTest, ".squatch"))
+	err := os.Rename(filepath.Join(srcTest, ".squatch"), filepath.Join(srcTest, ".bak"))
+	if err != nil {
+		t.Errorf("expected to rename .squatch, got %v", err)
+	}
+	Build(srcTest)
+	_, err = os.Stat(filepath.Join("dist", "index.html"))
+	if err != nil {
+		t.Errorf("expected index.html to exist, got %v", err)
+	}
+	_, err = os.Stat(filepath.Join("dist", "pages", "example.html"))
+	if err != nil {
+		t.Errorf("expected example.html to exist, got %v", err)
 	}
 }
