@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/gomarkdown/markdown"
@@ -16,18 +17,7 @@ func TestParserHeading(t *testing.T) {
 		Pages:         make([]Page, 0),
 		IgnoreFolders: make(map[string]bool),
 		IgnoreFiles:   make(map[string]bool),
-		ThemeConfig: ThemeConfig{
-			Heading: Heading{
-				Level: Level{
-					One:   "heading-one",
-					Two:   "heading-two",
-					Three: "heading-three",
-					Four:  "heading-four",
-					Five:  "heading-five",
-					Six:   "heading-six",
-				},
-			},
-		},
+		ThemeConfig:   ThemeConfig{},
 	}
 	md := []byte("# Heading One\n## Heading Two\n### Heading Three\n#### Heading Four\n##### Heading Five\n###### Heading Six")
 	// render the markdown file
@@ -37,7 +27,10 @@ func TestParserHeading(t *testing.T) {
 	}
 	renderer := html.NewRenderer(opts)
 	output := string(markdown.ToHTML(md, nil, renderer))
-	if output != "<h1 class=\"heading-one\">Heading One</h1>\n<h2 class=\"heading-two\">Heading Two</h2>\n<h3 class=\"heading-three\">Heading Three</h3>\n<h4 class=\"heading-four\">Heading Four</h4>\n<h5 class=\"heading-five\">Heading Five</h5>\n<h6 class=\"heading-six\">Heading Six</h6>\n" {
-		t.Errorf("Expected <h1 class=\"heading-one\">Heading One</h1>\\n<h2 class=\"heading-two\">Heading Two</h2>\\n<h3 class=\"heading-three\">Heading Three</h3>\\n<h4 class=\"heading-four\">Heading Four</h4>\\n<h5 class=\"heading-five\">Heading Five</h5>\\n<h6 class=\"heading-six\">Heading Six</h6>\\n, got %s", output)
+	output = strings.ReplaceAll(output, "\n", "")
+	output = strings.ReplaceAll(output, "\t", "")
+	output = strings.ReplaceAll(output, " ", "")
+	if output != "<h1>HeadingOne</h1><h2>HeadingTwo</h2><h3>HeadingThree</h3><h4>HeadingFour</h4><h5>HeadingFive</h5><h6>HeadingSix</h6>" {
+		t.Errorf("Expected: %s, got: %s", "<h1>Heading One</h1><h2>Heading Two</h2><h3>Heading Three</h3><h4>Heading Four</h4><h5>Heading Five</h5><h6>Heading Six</h6>", output)
 	}
 }

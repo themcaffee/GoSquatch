@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 
 	"github.com/gomarkdown/markdown/ast"
 )
@@ -101,8 +100,8 @@ func getSquatchConfig(fp string) (SquatchConfig, error) {
 	// read the config file
 	config, err := os.ReadFile(fp)
 	if err != nil {
-		fmt.Println("Could not read file: ", fp)
-		return configStruct, err
+		configStruct = SquatchConfig{DistDir: "dist", IgnoreFolders: "", IgnoreFiles: ""}
+		return configStruct, nil
 	}
 	err = json.Unmarshal(config, &configStruct)
 	if err != nil {
@@ -113,6 +112,7 @@ func getSquatchConfig(fp string) (SquatchConfig, error) {
 }
 
 func (app App) renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
+	// TODO: implement this
 	if _, ok := node.(*ast.List); ok {
 		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.ListItem); ok {
@@ -124,32 +124,7 @@ func (app App) renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkSt
 	} else if _, ok := node.(*ast.MathBlock); ok {
 		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.Heading); ok {
-		level := strconv.Itoa(node.(*ast.Heading).Level)
-		if !entering {
-			w.Write([]byte("</h" + level + ">\n"))
-			return ast.GoToNext, true
-		}
-		switch level {
-		case "1":
-			node := fmt.Sprintf("<h1 class=\"%s\">", app.ThemeConfig.Heading.Level.One)
-			w.Write([]byte(node))
-		case "2":
-			node := fmt.Sprintf("<h2 class=\"%s\">", app.ThemeConfig.Heading.Level.Two)
-			w.Write([]byte(node))
-		case "3":
-			node := fmt.Sprintf("<h3 class=\"%s\">", app.ThemeConfig.Heading.Level.Three)
-			w.Write([]byte(node))
-		case "4":
-			node := fmt.Sprintf("<h4 class=\"%s\">", app.ThemeConfig.Heading.Level.Four)
-			w.Write([]byte(node))
-		case "5":
-			node := fmt.Sprintf("<h5 class=\"%s\">", app.ThemeConfig.Heading.Level.Five)
-			w.Write([]byte(node))
-		case "6":
-			node := fmt.Sprintf("<h6 class=\"%s\">", app.ThemeConfig.Heading.Level.Six)
-			w.Write([]byte(node))
-		}
-		return ast.GoToNext, true
+		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.HorizontalRule); ok {
 		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.Emph); ok {
@@ -165,20 +140,7 @@ func (app App) renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkSt
 	} else if _, ok := node.(*ast.Citation); ok {
 		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.Image); ok {
-		if !entering {
-			w.Write([]byte("</figure>"))
-		}
-		src := string(node.(*ast.Image).Destination)
-		c := node.(*ast.Image).GetChildren()[0]
-		alt := string(c.AsLeaf().Literal)
-		if entering && alt != "" {
-			node := fmt.Sprintf("<figure class=\"%s\"><img src=\"%s\" alt=\"%s\">", app.ThemeConfig.Image, src, alt)
-			w.Write([]byte(node))
-		} else {
-			node := fmt.Sprintf("<figure class=\"%s\"><img src=\"%s\">", app.ThemeConfig.Image, src)
-			w.Write([]byte(node))
-		}
-		return ast.GoToNext, true
+		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.Text); ok {
 		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.HTMLBlock); ok {
