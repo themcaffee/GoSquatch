@@ -16,7 +16,7 @@ image with only an alpine image and a small binary program file. This allows for
 about 3s to pull down. Second, because this is written in Go this allows for a tight binary with super fast execution with the minimal depencies built in 
 the binary. The step to build the pages varies depending on size but will generally be less than 1 second. 
 
-[Check out our documentation built with GoSquatch!](https://mitchmcaffee.com/GoSquatch/)
+[Check out our documentation built with GoSquatch!](https://themcaffee.github.io/GoSquatch/)
 
 
 ## License
