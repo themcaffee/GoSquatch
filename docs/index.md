@@ -7,50 +7,7 @@ A super fast Github Action that converts markdown into a static HTML site.
 
 ## Quick Setup
 
-First off you will need to create a Github Action for your project if you don't already have one. You can either follow this walkthrough or use the [GoSquatch-template](https://github.com/themcaffee/GoSquatch-template) to start a new site. Create the file `.github/workflows/gosquatch.yml`
-with the following content:
-
-```
-name: GoSquatch
-
-on:
-  push:
-    branches:
-      - main
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "deploy"
-  cancel-in-progress: true
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build pages
-        uses: themcaffee/GoSquatch@1.0.28-beta
-        with:
-          srcDir: 'src'
-      - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: ls
-        run: ls
-      - name: Deploy
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: docs
-      - name: Deploy to Github Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
-```
+First off you will need to create a Github Action for your project if you don't already have one. You can either follow this walkthrough or use the [GoSquatch-template](https://github.com/themcaffee/GoSquatch-template) to start a new site. 
 
 ### Create template file
 
