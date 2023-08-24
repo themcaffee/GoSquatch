@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+
+	"path/filepath"
+	"regexp"
 
 	"github.com/gomarkdown/markdown/ast"
 )
@@ -142,6 +146,47 @@ func (app App) renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkSt
 	} else if _, ok := node.(*ast.Image); ok {
 		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.Text); ok {
+		wikiLinkRegexCompiled := regexp.MustCompile("/[[(.+?(|.+?)?)]]([W])/g")
+		wikiLink := wikiLinkRegexCompiled.ReplaceAllStringFunc(string(node.(*ast.Text).Literal), func(match string) string {
+			matches := wikiLinkRegexCompiled.FindStringSubmatch(match)
+			p1, p2, p3 := matches[1], matches[2], matches[3]
+			// p1 = Whole match, p2 = Link text, p3 = ?Whitespace
+			var slug string
+			if strings.Contains(p1, "|") {
+				slug = p1[:strings.Index(p1, "|")]
+			} else {
+				slug = p1
+			}
+			var filePathArr []string
+			filepath.Walk("/src", func(path string, info os.FileInfo, err error) error {
+				// TODO: Load the source directory from parameters or config
+				if err != nil {
+					return err
+				}
+				if !info.IsDir() && info.Name() == slug+".md" {
+					filePathArr = append(filePathArr, path[:len(path)-3])
+				}
+				return nil
+			})
+			var href string
+			if len(filePathArr) == 1 {
+				href = filePathArr[0]
+			} else {
+				href = slug // If href = slug, then it's a broken link
+			}
+			var linkText string
+			if p2 != "" {
+				linkText = p2[1:]
+			} else {
+				linkText = p1
+			}
+
+			linkMarkdown := fmt.Sprintf(`[%s](%s)%s`, linkText, href, p3)
+			return linkMarkdown
+		})
+
+		node.(*ast.Text).Literal = []byte(wikiLink)
+		// false so the default renderer handles the added link
 		return ast.GoToNext, false
 	} else if _, ok := node.(*ast.HTMLBlock); ok {
 		return ast.GoToNext, false
