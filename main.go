@@ -65,17 +65,14 @@ func (app App) getPage(fp string) (Page, error) {
 
 	// Get metadata
 	lines := strings.Split(string(md), "\n")
-	for lineNumber, line := range lines {
-		if strings.HasPrefix(line, "[_metadata_:title]:- \"") {
-			title := strings.TrimPrefix(line, "[_metadata_:title]:- \"")
-			page.Title = strings.TrimSuffix(title, "\"")
-		}
-		if strings.HasPrefix(line, "[_metadata_:layout]:- \"") {
-			layout := strings.TrimPrefix(line, "[_metadata_:layout]:- \"")
-			page.Layout = strings.TrimSuffix(layout, "\"")
-		}
-		if lineNumber > 2 {
-			break
+	for _, line := range lines {
+		if strings.HasPrefix(line, "[_metadata_:") {
+			value := strings.SplitAfter(line, "\"")[1]
+			if strings.HasPrefix(line, "[_metadata_:title]:-") {
+				page.Title = value
+			} else if strings.HasPrefix(line, "[_metadata_:layout]:-") {
+				page.Layout = value
+			}
 		}
 	}
 
