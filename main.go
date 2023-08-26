@@ -135,7 +135,9 @@ func (app App) renderPage(page Page) (err error) {
 		fmt.Println("Could not get relative path: ", err)
 		return err
 	}
-	newFilePath := relpath[:len(relpath)-3] + ".html"
+	newFilePath := filepath.Dir(relpath) + "/" + page.Title + ".html"
+	newFilePath = strings.ReplaceAll(newFilePath, " ", "-")
+	newFilePath = strings.ToLower(newFilePath)
 	newFilePath = filepath.Join(app.DistDir, newFilePath)
 	if err := os.MkdirAll(filepath.Dir(newFilePath), 0755); err != nil {
 		fmt.Println("Could not create directory: ", err)
