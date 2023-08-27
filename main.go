@@ -12,6 +12,8 @@ import (
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
+
+	"github.com/adrg/frontmatter"
 )
 
 type App struct {
@@ -54,6 +56,37 @@ func (app App) getPage(fp string) (Page, error) {
 		fmt.Println("Could not read file: ", fp)
 		return page, err
 	}
+	// Get metadata
+	if strings.HasPrefix(string(md), "---") {
+		// Parse the frontmatter
+		var matter struct {
+			Title  string `yaml:"title"`
+			Layout string `yaml:"layout"`
+		}
+
+		rest, err := frontmatter.Parse(strings.NewReader(string(md)), &matter)
+		if err != nil {
+			fmt.Println("Could not parse frontmatter: ", err)
+			return page, err
+		}
+		page.Title = matter.Title
+		page.Layout = matter.Layout
+
+		md = rest
+	} else {
+		// Parse the metadata
+		lines := strings.Split(string(md), "\n")
+		for _, line := range lines {
+			if strings.HasPrefix(line, "[_metadata_:") {
+				value := strings.SplitAfter(line, "\"")[1]
+				if strings.HasPrefix(line, "[_metadata_:title]:-") {
+					page.Title = value
+				} else if strings.HasPrefix(line, "[_metadata_:layout]:-") {
+					page.Layout = value
+				}
+			}
+		}
+	}
 
 	// render the markdown file
 	opts := html.RendererOptions{
@@ -62,22 +95,6 @@ func (app App) getPage(fp string) (Page, error) {
 	}
 	renderer := html.NewRenderer(opts)
 	page.Body = string(markdown.ToHTML(md, nil, renderer))
-
-	// Get metadata
-	lines := strings.Split(string(md), "\n")
-	for lineNumber, line := range lines {
-		if strings.HasPrefix(line, "[_metadata_:title]:- \"") {
-			title := strings.TrimPrefix(line, "[_metadata_:title]:- \"")
-			page.Title = strings.TrimSuffix(title, "\"")
-		}
-		if strings.HasPrefix(line, "[_metadata_:layout]:- \"") {
-			layout := strings.TrimPrefix(line, "[_metadata_:layout]:- \"")
-			page.Layout = strings.TrimSuffix(layout, "\"")
-		}
-		if lineNumber > 2 {
-			break
-		}
-	}
 
 	// If the page metadata cannot be found, return an error to skip the page
 	// This is useful for markdown that are not pages
