@@ -247,16 +247,20 @@ func InitApp(srcDir string) (App, error) {
 		return app, err
 	}
 	app.DistDir = squatchConfig.DistDir
-	// parse the comma separated list of folders to ignore
+	// load the list of folders to ignore
 	app.IgnoreFolders = map[string]bool{app.DistDir: true}
-	ignoreFoldersList := strings.Split(squatchConfig.IgnoreFolders, ",")
-	for _, folder := range ignoreFoldersList {
+	for _, folder := range squatchConfig.IgnoreFolders {
+		if folder == "" {
+			continue
+		}
 		app.IgnoreFolders[folder] = true
 	}
 	app.IgnoreFiles = map[string]bool{}
-	// parse the comma separated list of files to ignore
-	ignoreFilesList := strings.Split(squatchConfig.IgnoreFiles, ",")
-	for _, file := range ignoreFilesList {
+	// load the list of files to ignore
+	for _, file := range squatchConfig.IgnoreFiles {
+		if file == "" {
+			continue
+		}
 		app.IgnoreFiles[file] = true
 	}
 	// Remove existing dist directory

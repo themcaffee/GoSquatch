@@ -11,8 +11,8 @@ import (
 
 type SquatchConfig struct {
 	DistDir       string      `json:"dist"`
-	IgnoreFolders string      `json:"ignore_folders"`
-	IgnoreFiles   string      `json:"ignore_files"`
+	IgnoreFolders []string    `json:"ignoreFolders"`
+	IgnoreFiles   []string    `json:"ignoreFiles"`
 	ThemeConfig   ThemeConfig `json:"theme"`
 }
 
@@ -100,7 +100,7 @@ func getSquatchConfig(fp string) (SquatchConfig, error) {
 	// read the config file
 	config, err := os.ReadFile(fp)
 	if err != nil {
-		configStruct = SquatchConfig{DistDir: "dist", IgnoreFolders: "", IgnoreFiles: ""}
+		configStruct = SquatchConfig{DistDir: "dist", IgnoreFolders: []string{}, IgnoreFiles: []string{}}
 		return configStruct, nil
 	}
 	err = json.Unmarshal(config, &configStruct)
