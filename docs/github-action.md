@@ -13,7 +13,7 @@ The source directory to pull the markdown and templates from. Default `"src"`.
 
 ## Configuration
 
-GoSquatch is configured with a `.squatch` in the folder `srcDir`. This file is not required and the action will just fine without it. However,
+GoSquatch is configured with a `.squatch` in the folder `srcDir`. This file is not required and the action will run just fine without it. However,
 if you need additional configuration options then it is available.
 
 ## Example Usage
