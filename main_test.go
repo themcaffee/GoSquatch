@@ -105,6 +105,22 @@ func TestGetPage(t *testing.T) {
 	}
 }
 
+func TestGetPageFrontmatter(t *testing.T) {
+	srcTest := "src_test"
+	app, _ := InitApp(srcTest)
+	defer cleanup(app.DistDir)
+	page, err := app.getPage(filepath.Join(srcTest, "pages", "frontmatter.md"))
+	if err != nil {
+		t.Errorf("expected getPage to return no error, got %v", err)
+	}
+	if page.Title != "Frontmatter Title" {
+		t.Errorf("expected page title to be 'Frontmatter Title', got %v", page.Title)
+	}
+	if page.Layout != "pages" {
+		t.Errorf("expected page layout to be 'pages', got %v", page.Layout)
+	}
+}
+
 func TestBuild(t *testing.T) {
 	srcTest := "src_test"
 	defer cleanup("dist")
@@ -117,6 +133,10 @@ func TestBuild(t *testing.T) {
 	_, err = os.Stat(filepath.Join("dist", "pages", "example.html"))
 	if err != nil {
 		t.Errorf("expected example.html to exist, got %v", err)
+	}
+	_, err = os.Stat(filepath.Join("dist", "pages", "frontmatter.html"))
+	if err != nil {
+		t.Errorf("expected frontmatter.html to exist, got %v", err)
 	}
 }
 
