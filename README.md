@@ -11,7 +11,7 @@ GoSquatch takes about 3 seconds on Github Actions to execute. This allows with c
 
 _Why is it so fast?_ 
 
-First, there is a seperately built and published docker image `themcaffee/gosquatch` that builds an extremely lean docker 
+First, there is a separately built and published docker image `themcaffee/gosquatch` that builds an extremely lean docker
 image with only an alpine image and a small binary program file. This allows for this action to pull a very small image hosted on Github that only takes 
 about 3s to pull down. Second, because this is written in Go this allows for a tight binary with super fast execution with the minimal depencies built in 
 the binary. The step to build the pages varies depending on size but will generally be less than 1 second. 
