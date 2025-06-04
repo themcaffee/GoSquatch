@@ -55,17 +55,27 @@ func (app App) getPage(fp string) (Page, error) {
 		return page, err
 	}
 
-	// render the markdown file
-	opts := html.RendererOptions{
-		Flags:          html.FlagsNone,
-		RenderNodeHook: app.renderHook,
-	}
-	renderer := html.NewRenderer(opts)
-	page.Body = string(markdown.ToHTML(md, nil, renderer))
-
-	// Get metadata
 	lines := strings.Split(string(md), "\n")
-	for lineNumber, line := range lines {
+	contentStart := 0
+	if len(lines) > 0 && strings.TrimSpace(lines[0]) == "---" {
+		for i := 1; i < len(lines); i++ {
+			if strings.TrimSpace(lines[i]) == "---" {
+				fm := lines[1:i]
+				for _, l := range fm {
+					l = strings.TrimSpace(l)
+					if strings.HasPrefix(l, "title:") {
+						page.Title = strings.TrimSpace(strings.TrimPrefix(l, "title:"))
+					} else if strings.HasPrefix(l, "layout:") {
+						page.Layout = strings.TrimSpace(strings.TrimPrefix(l, "layout:"))
+					}
+				}
+				contentStart = i + 1
+				break
+			}
+		}
+	}
+
+	for _, line := range lines[contentStart:] {
 		if strings.HasPrefix(line, "[_metadata_:title]:- \"") {
 			title := strings.TrimPrefix(line, "[_metadata_:title]:- \"")
 			page.Title = strings.TrimSuffix(title, "\"")
@@ -74,10 +84,17 @@ func (app App) getPage(fp string) (Page, error) {
 			layout := strings.TrimPrefix(line, "[_metadata_:layout]:- \"")
 			page.Layout = strings.TrimSuffix(layout, "\"")
 		}
-		if lineNumber > 2 {
-			break
-		}
 	}
+
+	// render the markdown file (without frontmatter)
+	bodyLines := lines[contentStart:]
+	mdBody := strings.Join(bodyLines, "\n")
+	opts := html.RendererOptions{
+		Flags:          html.FlagsNone,
+		RenderNodeHook: app.renderHook,
+	}
+	renderer := html.NewRenderer(opts)
+	page.Body = string(markdown.ToHTML([]byte(mdBody), nil, renderer))
 
 	// If the page metadata cannot be found, return an error to skip the page
 	// This is useful for markdown that are not pages
