@@ -158,3 +158,18 @@ func TestBuildNoSquatchFile(t *testing.T) {
 		t.Errorf("expected example.html to exist, got %v", err)
 	}
 }
+
+func TestInitAppIgnoreLists(t *testing.T) {
+        srcTest := "src_test_ignore"
+        app, err := InitApp(srcTest)
+        defer cleanup(app.DistDir)
+        if err != nil {
+                t.Errorf("expected InitApp to return no error, got %v", err)
+        }
+        if _, ok := app.IgnoreFolders["static"]; !ok {
+                t.Errorf("expected IgnoreFolders to contain 'static'")
+        }
+        if _, ok := app.IgnoreFiles["README.md"]; !ok {
+                t.Errorf("expected IgnoreFiles to contain 'README.md'")
+        }
+}
