@@ -1,6 +1,10 @@
 # GoSquatch
 
-GoSquatch is a fast Github Action that converts markdown into a static HTML site. This is useful for personal blogs and project documentation to keep pages in standard markdown while hosting them through Github Pages (or other providers). GoSquatch uses [native golang templating](https://pkg.go.dev/text/template) and [gomarkdown/markdown](https://github.com/gomarkdown/markdown) to handle markdown parsing. It includes a live building server so you can easily preview your site locally before publishing it. See the [performance documentation](https://mitchmcaffee.com/GoSquatch/performance) for details on execution speed.
+GoSquatch is a fast GitHub Action that converts Markdown into a static HTML site.
+It is useful for personal blogs and project documentation, letting you keep pages in standard Markdown while hosting them through GitHub Pages or other providers.
+GoSquatch uses [native Go templating](https://pkg.go.dev/text/template) and [gomarkdown/markdown](https://github.com/gomarkdown/markdown) to handle Markdown parsing.
+It includes a live server so you can preview your site locally before publishing.
+See the [performance documentation](https://mitchmcaffee.com/GoSquatch/performance) for details on execution speed.
 
 [Check out our documentation built with GoSquatch!](https://themcaffee.github.io/GoSquatch/)
 
@@ -34,7 +38,7 @@ Add GoSquatch to your workflow to build pages during CI:
   uses: themcaffee/GoSquatch@1.0.28-beta
 ```
 
-The action reads markdown from `src` and outputs static files to `dist` ready for hosting.
+The action reads Markdown from `src` and outputs static files to `dist` ready for hosting.
 
 
 ## License
